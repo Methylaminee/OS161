@@ -1,6 +1,36 @@
 #!/bin/sh
 
-cd os161/scratch
+# create build directories
+#mkdir ~/os161
+#mkdir ~/os161/toolbuild
+#mkdir ~/os161/tools
+#mkdir ~/os161/tools/bin
+#mkdir ~/os161/scratch
+
+# add tools/bin to path 
+#export PATH=~/os161/tools/bin:$PATH
+
+
+# download source
+#cd ~/os161/scratch
+# wget http://os161.eecs.harvard.edu/download/binutils-2.24+os161-2.1.tar.gz
+# wget http://os161.eecs.harvard.edu/download/gcc-4.8.3+os161-2.1.tar.gz
+# wget http://os161.eecs.harvard.edu/download/gdb-7.8+os161-2.1.tar.gz
+# wget http://os161.eecs.harvard.edu/download/bmake-20101215.tar.gz
+# wget http://os161.eecs.harvard.edu/download/mk-20100612.tar.gz
+# wget http://os161.eecs.harvard.edu/download/sys161-2.0.2.tar.gz
+
+#untar
+# cd ~/os161/scratch
+# tar -xvzf binutils-2.24+os161-2.1.tar.gz
+# tar -xvzf gcc-4.8.3+os161-2.1.tar.gz
+# tar -xvzf gdb-7.8+os161-2.1.tar.gz
+# tar -xvzf sys161-2.0.2.tar.gz
+# tar -xvzf bmake-20101215.tar.gz
+# cd bmake
+# tar -xvzf ../mk-20100612.tar.gz
+#cd ..
+cd ~/os161/scratch
 
 #GMP
 cd gmp-4.3.2

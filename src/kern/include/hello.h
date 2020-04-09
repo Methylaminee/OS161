@@ -7,6 +7,9 @@
 
 #include "opt-hello.h"
 #if OPT_HELLO
+
+#define K 1000
+
 void hello(void);
 #endif
 
