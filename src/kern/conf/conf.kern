@@ -339,6 +339,8 @@ file      proc/proc.c
 
 file      vm/kmalloc.c
 
+defoption notsodumb
+
 optofffile dumbvm   vm/addrspace.c
 
 #

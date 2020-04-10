@@ -30,7 +30,8 @@ options sfs			# Always use the file system
 #options netfs			# You might write this as a project.
 
 options dumbvm			# Chewing gum and baling wire.
+options notsodumb       # Provides Free for dumbvm VM handling
 
-options hello           #hello world call
+options hello           # Hello World call
 
-options syscalls        #provide support to syscalls write/read/exit & memory dealloc mngmt
+options syscalls        # Provides support to syscalls write/read/exit

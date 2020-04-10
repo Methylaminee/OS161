@@ -41,6 +41,7 @@
 #include <sfs.h>
 #include <syscall.h>
 #include <test.h>
+#include <vm.h>
 #include "opt-sfs.h"
 #include "opt-net.h"
 
@@ -402,6 +403,18 @@ cmd_kheapdump(int nargs, char **args)
 	return 0;
 }
 
+static int cmd_memstats(int nargs, char **args) {
+  (void)args;
+
+  if (nargs == 1) {
+    memstats();
+  } else {
+    kprintf("Usage: memstats\n");
+  }
+
+  return 0;
+}
+
 ////////////////////////////////////////
 //
 // Menus.
@@ -507,6 +520,7 @@ static const char *mainmenu[] = {
 	"[kh] Kernel heap stats              ",
 	"[khgen] Next kernel heap generation ",
 	"[khdump] Dump kernel heap           ",
+	"[memstats] Virtual memory stats     ",
 	"[q] Quit and shut down              ",
 	NULL
 };
@@ -556,6 +570,7 @@ static struct {
 	{ "kh",         cmd_kheapstats },
 	{ "khgen",      cmd_kheapgeneration },
 	{ "khdump",     cmd_kheapdump },
+    { "memstats",   cmd_memstats },
 
 	/* base system tests */
 	{ "at",		arraytest },
