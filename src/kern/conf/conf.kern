@@ -326,6 +326,9 @@ file      thread/synch.c
 file      thread/thread.c
 file      thread/threadlist.c
 
+defoption semlock
+defoption wchanlock
+
 #
 # Process system
 #

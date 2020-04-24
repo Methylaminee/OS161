@@ -36,6 +36,9 @@
 
 
 #include <spinlock.h>
+#include "opt-semlock.h"
+#include "opt-wchanlock.h"
+
 
 /*
  * Dijkstra-style semaphore.
@@ -72,12 +75,35 @@ void V(struct semaphore *);
  * The name field is for easier debugging. A copy of the name is
  * (should be) made internally.
  */
+
 struct lock {
+#if OPT_SEMLOCK
+
         char *lk_name;
         // add what you need here
         // (don't forget to mark things volatile as needed)
-};
+        struct semaphore *lk_sem;
+        struct thread *lk_owner;
+        /* if you want, you can create a spinlock to read owner,
+         * but i don't think is mandatory cause if someone that's not the owner reads a wrong data (can be curthread or NULL) there's no problem */
 
+#elif OPT_WCHANLOCK
+
+        char *lk_name;
+        // add what you need here
+        // (don't forget to mark things volatile as needed)
+	    struct wchan *lk_wchan;
+	    struct spinlock wchan_spinlk;
+        struct thread *lk_owner;
+
+#else // standard mngmt
+
+        char *lk_name;
+        // add what you need here
+        // (don't forget to mark things volatile as needed)
+
+#endif
+};
 struct lock *lock_create(const char *name);
 void lock_destroy(struct lock *);
 

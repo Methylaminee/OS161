@@ -40,6 +40,9 @@
 #include <current.h>
 #include <synch.h>
 
+#include "opt-semlock.h"
+#include "opt-wchanlock.h"
+
 ////////////////////////////////////////////////////////////
 //
 // Semaphore.
@@ -155,7 +158,14 @@ lock_create(const char *name)
         }
 
         // add stuff here as needed
-
+#if OPT_SEMLOCK
+        lock->lk_sem = sem_create(name, 1);
+        lock->lk_owner = NULL;
+#elif OPT_WCHANLOCK
+        lock->lk_owner = NULL;
+        spinlock_init(&lock->wchan_spinlk);
+        lock->lk_wchan = wchan_create(lock->lk_name);
+#endif
         return lock;
 }
 
@@ -165,6 +175,14 @@ lock_destroy(struct lock *lock)
         KASSERT(lock != NULL);
 
         // add stuff here as needed
+#if OPT_SEMLOCK
+        sem_destroy(lock->lk_sem);
+        kfree(lock->lk_owner);
+#elif OPT_WCHANLOCK
+        spinlock_cleanup(&lock->wchan_spinlk);
+        kfree(&lock->wchan_spinlk);
+        wchan_destroy(lock->lk_wchan);
+#endif
 
         kfree(lock->lk_name);
         kfree(lock);
@@ -174,26 +192,75 @@ void
 lock_acquire(struct lock *lock)
 {
         // Write this
+#if OPT_SEMLOCK
 
+        if(lock != NULL) {
+          P(lock->lk_sem);
+          lock->lk_owner = curthread;
+        }
+#elif OPT_WCHANLOCK
+        /* 0) check owner and acquire spinlock
+         * 1) test lock_count -> se 0 wait channel
+         *                    -> se 1 lock spinlock
+         * 2) acquire lock
+         * 3) release spinlock
+         * */
+        spinlock_acquire(&lock->wchan_spinlk);
+        while (lock->lk_owner != NULL) {
+          wchan_sleep(lock->lk_wchan, &lock->wchan_spinlk);
+        }
+        KASSERT(lock->lk_owner == NULL);
+
+        lock->lk_owner = curthread;
+        spinlock_release(&lock->wchan_spinlk);
+#else
         (void)lock;  // suppress warning until code gets written
+#endif
 }
 
 void
 lock_release(struct lock *lock)
 {
         // Write this
+#if OPT_SEMLOCK
 
-        (void)lock;  // suppress warning until code gets written
+      KASSERT(lock_do_i_hold(lock));
+
+      lock->lk_owner = NULL;
+      V(lock->lk_sem);
+
+#elif OPT_WCHANLOCK
+      /* 0) check owner
+       * 1) lock spinlock
+       * 2) release
+       * 3) release spinlock
+       * */
+      KASSERT(lock_do_i_hold(lock));
+
+      spinlock_acquire(&lock->wchan_spinlk);
+      lock->lk_owner = NULL;
+      KASSERT(lock->lk_owner == NULL);
+      wchan_wakeone(lock->lk_wchan, &lock->wchan_spinlk);
+      spinlock_release(&lock->wchan_spinlk);
+#else
+        (void)lock;  // suppress warning until code gets
+#endif
 }
 
 bool
 lock_do_i_hold(struct lock *lock)
 {
         // Write this
-
+#if OPT_SEMLOCK || OPT_WCHANLOCK
+        if (lock == NULL || (lock->lk_owner == curthread)) {
+          return true;
+        }
+        return false;
+#else
         (void)lock;  // suppress warning until code gets written
 
         return true; // dummy until code gets written
+#endif
 }
 
 ////////////////////////////////////////////////////////////
