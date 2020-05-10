@@ -48,11 +48,19 @@
 #include <current.h>
 #include <addrspace.h>
 #include <vnode.h>
+#include <synch.h>
+#include <limits.h>
+#include "opt-waitpid.h"
 
 /*
  * The process for the kernel; this holds all the kernel-only threads.
  */
 struct proc *kproc;
+
+#ifdef OPT_WAITPID
+struct proc *pid_table[100];
+int pid_count = PID_MIN;
+#endif
 
 /*
  * Create a proc structure.
@@ -82,8 +90,41 @@ proc_create(const char *name)
 	/* VFS fields */
 	proc->p_cwd = NULL;
 
+#ifdef OPT_WAITPID
+	proc->p_exit_lk = lock_create(name);
+	proc->p_exit_cv = cv_create(name);
+
+    proc->p_id = generate_pid();
+    if (proc->p_id == -1) {
+      // can't create process...
+    }
+
+    pid_table[proc->p_id] = proc;
+
+#endif
 	return proc;
 }
+
+#ifdef OPT_WAITPID
+
+int proc_wait(struct proc *p) {
+    int exit_code;
+    lock_acquire(p->p_exit_lk);
+    cv_wait(p->p_exit_cv, p->p_exit_lk);
+    lock_release(p->p_exit_lk);
+    exit_code = p->p_exitStatus;
+    proc_destroy(p);
+    return exit_code;
+    //return curthread->t_exitStatus;
+}
+
+pid_t generate_pid(void) {
+  if (pid_count == PID_MAX) {
+    return -1;
+  }
+  return pid_count++;
+}
+#endif
 
 /*
  * Destroy a proc structure.
@@ -167,6 +208,14 @@ proc_destroy(struct proc *proc)
 
 	KASSERT(proc->p_numthreads == 0);
 	spinlock_cleanup(&proc->p_lock);
+
+#ifdef OPT_WAITPID
+	lock_destroy(proc->p_exit_lk);
+	cv_destroy(proc->p_exit_cv);
+
+	pid_table[proc->p_id] = NULL;
+	proc->p_id = -1;
+#endif
 
 	kfree(proc->p_name);
 	kfree(proc);

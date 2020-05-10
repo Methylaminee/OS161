@@ -37,22 +37,44 @@
 #include <thread.h>
 #include <addrspace.h>
 #include <current.h>
+#include <synch.h>
+#include "opt-waitpid.h"
 
 void save_status(int status) {
   struct thread *curThread = curthread;
-  curThread->t_exitStatus = status;
-  /* 
   struct proc *curProc = curproc;
+
+  curThread->t_exitStatus = status;
   curProc->p_exitStatus = status;
-   */
 }
 
+#ifdef OPT_WAITPID
+int sys_waitpid(pid_t pid) {
+  /*if (pid_table != NULL) {
+    struct proc *p = pid_table[pid];
+    return proc_wait(p);
+  }*/
+  return pid;
+}
+#endif
+
 void sys__exit(int status) {
-  // get current process address space, null if no proc
-  struct addrspace *as = proc_getas();
 
   save_status(status);
+
+#ifdef OPT_WAITPID
+  struct proc *p = curproc;
+  lock_acquire(p->p_exit_lk);
+  cv_signal(p->p_exit_cv, p->p_exit_lk);
+  proc_remthread(curthread);
+  lock_release(p->p_exit_lk);
+
+#else
+  // get current process address space, null if no proc
+  struct addrspace *as = proc_getas();
   as_destroy(as);
+#endif
+
   thread_exit();
   // thread_exit doesn't return, so if I can read this, there's a problem
   panic("thread_exit returned?!?!\n");

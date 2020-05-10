@@ -37,6 +37,7 @@
  */
 
 #include <spinlock.h>
+#include "opt-waitpid.h"
 
 struct addrspace;
 struct thread;
@@ -72,6 +73,13 @@ struct proc {
 
 	/* add more material here as needed */
 	int p_exitStatus;
+
+#ifdef OPT_WAITPID
+	pid_t p_id;
+
+	struct lock *p_exit_lk;
+	struct cv *p_exit_cv;
+#endif
 };
 
 /* This is the process structure for the kernel and for kernel-only threads. */
@@ -82,6 +90,16 @@ void proc_bootstrap(void);
 
 /* Create a fresh process for use by runprogram(). */
 struct proc *proc_create_runprogram(const char *name);
+
+#ifdef OPT_WAITPID
+extern struct proc *pid_table[100];
+extern int pid_count;
+
+/* Wait for child thread */
+int proc_wait(struct proc *p);
+int init_pid_table(int size);
+pid_t generate_pid(void);
+#endif
 
 /* Destroy a process. */
 void proc_destroy(struct proc *proc);

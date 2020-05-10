@@ -33,6 +33,7 @@
 
 #include <cdefs.h> /* for __DEAD */
 #include "opt-syscalls.h"
+#include "opt-waitpid.h"
 
 struct trapframe; /* from <machine/trapframe.h> */
 
@@ -67,6 +68,10 @@ int sys_write(int fd, userptr_t buf, size_t nbytes);
 
 void sys__exit(int status);
 void save_status(int status);
+#endif
+
+#ifdef OPT_WAITPID
+int sys_waitpid(pid_t pid);
 #endif
 
 #endif /* _SYSCALL_H_ */

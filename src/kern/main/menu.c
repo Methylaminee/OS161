@@ -44,6 +44,7 @@
 #include <vm.h>
 #include "opt-sfs.h"
 #include "opt-net.h"
+#include "opt-waitpid.h"
 
 /*
  * In-kernel menu and command dispatcher.
@@ -136,7 +137,13 @@ common_prog(int nargs, char **args)
 	 * The new process will be destroyed when the program exits...
 	 * once you write the code for handling that.
 	 */
+#ifdef OPT_WAITPID
+	int exit_code = proc_wait(proc);
 
+	kprintf("Process finished with status code: %d\n", exit_code);
+
+	return exit_code;
+#endif
 	return 0;
 }
 

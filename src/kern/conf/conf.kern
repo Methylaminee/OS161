@@ -336,6 +336,8 @@ defoption condvars
 
 file      proc/proc.c
 
+defoption waitpid
+
 #
 # Virtual memory system
 # (you will probably want to add stuff here while doing the VM assignment)

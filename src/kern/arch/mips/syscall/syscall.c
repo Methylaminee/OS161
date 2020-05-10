@@ -35,6 +35,8 @@
 #include <thread.h>
 #include <current.h>
 #include <syscall.h>
+#include "opt-syscalls.h"
+#include "opt-waitpid.h"
 
 
 /*
@@ -110,7 +112,7 @@ syscall(struct trapframe *tf)
 		break;
 
 	    /* Add stuff here */
-#if OPT_SYSCALLS
+#ifdef OPT_SYSCALLS
         case SYS_write:
 	      retval = sys_write((int)tf->tf_a0,
 	                      (userptr_t)tf->tf_a1,
@@ -134,6 +136,11 @@ syscall(struct trapframe *tf)
 	    case SYS__exit:
 	      sys__exit((int)tf->tf_a0);
 	      break;
+#endif
+#ifdef OPT_WAITPID
+	  	case SYS_waitpid:
+	  	  err = sys_waitpid((pid_t)tf->tf_a0);
+	  	  break;
 #endif
 	    default:
 		kprintf("Unknown syscall %d\n", callno);
