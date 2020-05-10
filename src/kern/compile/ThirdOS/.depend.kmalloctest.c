@@ -6,5 +6,5 @@ kmalloctest.o: ../../test/kmalloctest.c ../../include/types.h \
  includelinks/machine/spinlock.h ../../include/threadlist.h \
  includelinks/machine/thread.h ../../include/setjmp.h \
  includelinks/kern/machine/setjmp.h ../../include/synch.h opt-semlock.h \
- opt-wchanlock.h ../../include/vm.h includelinks/machine/vm.h \
- ../../include/test.h opt-dumbvm.h
+ opt-wchanlock.h opt-condvars.h ../../include/vm.h \
+ includelinks/machine/vm.h ../../include/test.h opt-dumbvm.h

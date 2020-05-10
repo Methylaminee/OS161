@@ -6,4 +6,5 @@ device.o: ../../vfs/device.c ../../include/types.h \
  ../../include/lib.h ../../include/cdefs.h opt-noasserts.h \
  ../../include/uio.h ../../include/kern/iovec.h ../../include/synch.h \
  ../../include/spinlock.h includelinks/machine/spinlock.h opt-semlock.h \
- opt-wchanlock.h ../../include/vnode.h ../../include/device.h
+ opt-wchanlock.h opt-condvars.h ../../include/vnode.h \
+ ../../include/device.h

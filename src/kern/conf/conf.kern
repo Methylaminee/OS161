@@ -328,6 +328,7 @@ file      thread/threadlist.c
 
 defoption semlock
 defoption wchanlock
+defoption condvars
 
 #
 # Process system

@@ -5,4 +5,5 @@ threadtest.o: ../../test/threadtest.c ../../include/types.h \
  ../../include/spinlock.h includelinks/machine/spinlock.h \
  ../../include/threadlist.h includelinks/machine/thread.h \
  ../../include/setjmp.h includelinks/kern/machine/setjmp.h \
- ../../include/synch.h opt-semlock.h opt-wchanlock.h ../../include/test.h
+ ../../include/synch.h opt-semlock.h opt-wchanlock.h opt-condvars.h \
+ ../../include/test.h

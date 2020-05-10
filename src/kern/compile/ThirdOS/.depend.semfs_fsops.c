@@ -3,6 +3,6 @@ semfs_fsops.o: ../../fs/semfs/semfs_fsops.c ../../include/types.h \
  includelinks/machine/types.h ../../include/kern/errno.h \
  ../../include/synch.h ../../include/spinlock.h ../../include/cdefs.h \
  includelinks/machine/spinlock.h opt-semlock.h opt-wchanlock.h \
- ../../include/vfs.h ../../include/array.h ../../include/lib.h \
- opt-noasserts.h ../../include/fs.h ../../include/vnode.h \
- ../../fs/semfs/semfs.h
+ opt-condvars.h ../../include/vfs.h ../../include/array.h \
+ ../../include/lib.h opt-noasserts.h ../../include/fs.h \
+ ../../include/vnode.h ../../fs/semfs/semfs.h

@@ -38,7 +38,7 @@
 #include <spinlock.h>
 #include "opt-semlock.h"
 #include "opt-wchanlock.h"
-
+#include "opt-condvars.h"
 
 /*
  * Dijkstra-style semaphore.
@@ -141,6 +141,10 @@ struct cv {
         char *cv_name;
         // add what you need here
         // (don't forget to mark things volatile as needed)
+#ifdef OPT_CONDVARS
+        struct wchan *cv_wchan;
+        struct spinlock wc_spin;
+#endif
 };
 
 struct cv *cv_create(const char *name);

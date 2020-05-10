@@ -181,15 +181,15 @@ getppages(unsigned long npages)
     addr = ram_stealmem(npages);
     spinlock_release(&stealmem_lock);
 
-    if (addr != 0 && isAllocationTableEnabled()) {
-      spinlock_acquire(&checkmem_lock);
-      firstToAlloc = ((int)addr / PAGE_SIZE);
-      for (i=firstToAlloc; i < (int)npages; i++) {
-        freeRamFrames[i] = 0;
-      }
-      frameAllocSize[firstToAlloc] = npages;
-      spinlock_release(&checkmem_lock);
+  }
+  if (addr != 0 && isAllocationTableEnabled()) {
+    spinlock_acquire(&checkmem_lock);
+    firstToAlloc = ((int)addr / PAGE_SIZE);
+    for (i=firstToAlloc; i < (int)npages; i++) {
+      freeRamFrames[i] = 0;
     }
+    frameAllocSize[firstToAlloc] = npages;
+    spinlock_release(&checkmem_lock);
   }
 
   return addr;

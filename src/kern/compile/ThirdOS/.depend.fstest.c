@@ -7,5 +7,5 @@ fstest.o: ../../test/fstest.c ../../include/types.h \
  includelinks/machine/spinlock.h ../../include/threadlist.h \
  includelinks/machine/thread.h ../../include/setjmp.h \
  includelinks/kern/machine/setjmp.h ../../include/synch.h opt-semlock.h \
- opt-wchanlock.h ../../include/vfs.h ../../include/fs.h \
+ opt-wchanlock.h opt-condvars.h ../../include/vfs.h ../../include/fs.h \
  ../../include/vnode.h ../../include/test.h

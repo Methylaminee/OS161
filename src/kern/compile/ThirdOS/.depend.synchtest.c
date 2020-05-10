@@ -6,4 +6,4 @@ synchtest.o: ../../test/synchtest.c ../../include/types.h \
  includelinks/machine/spinlock.h ../../include/threadlist.h \
  includelinks/machine/thread.h ../../include/setjmp.h \
  includelinks/kern/machine/setjmp.h ../../include/synch.h opt-semlock.h \
- opt-wchanlock.h ../../include/test.h
+ opt-wchanlock.h opt-condvars.h ../../include/test.h

@@ -42,6 +42,7 @@
 
 #include "opt-semlock.h"
 #include "opt-wchanlock.h"
+#include "opt-condvars.h"
 
 ////////////////////////////////////////////////////////////
 //
@@ -180,7 +181,6 @@ lock_destroy(struct lock *lock)
         kfree(lock->lk_owner);
 #elif OPT_WCHANLOCK
         spinlock_cleanup(&lock->wchan_spinlk);
-        kfree(&lock->wchan_spinlk);
         wchan_destroy(lock->lk_wchan);
 #endif
 
@@ -285,7 +285,15 @@ cv_create(const char *name)
         }
 
         // add stuff here as needed
-
+#ifdef OPT_CONDVARS
+        cv->cv_wchan = wchan_create(name);
+        if (cv->cv_wchan == NULL) {
+          kfree(cv->cv_name);
+          kfree(cv);
+          return NULL;
+        }
+        spinlock_init(&cv->wc_spin);
+#endif
         return cv;
 }
 
@@ -295,7 +303,11 @@ cv_destroy(struct cv *cv)
         KASSERT(cv != NULL);
 
         // add stuff here as needed
-
+#ifdef OPT_CONDVARS
+        spinlock_cleanup(&cv->wc_spin);
+        //kfree(cv->wc_spin);
+        wchan_destroy(cv->cv_wchan);
+#endif
         kfree(cv->cv_name);
         kfree(cv);
 }
@@ -303,23 +315,46 @@ cv_destroy(struct cv *cv)
 void
 cv_wait(struct cv *cv, struct lock *lock)
 {
+#ifdef OPT_CONDVARS
+
+        spinlock_acquire(&cv->wc_spin);
+        lock_release(lock);
+        wchan_sleep(cv->cv_wchan, &cv->wc_spin);
+        spinlock_release(&cv->wc_spin);
+        lock_acquire(lock);
+#else
         // Write this
         (void)cv;    // suppress warning until code gets written
         (void)lock;  // suppress warning until code gets written
+#endif
 }
 
 void
 cv_signal(struct cv *cv, struct lock *lock)
 {
+#ifdef OPT_CONDVARS
+        KASSERT(lock->lk_owner == curthread);
+        spinlock_acquire(&cv->wc_spin);
+        wchan_wakeone(cv->cv_wchan, &cv->wc_spin);
+        spinlock_release(&cv->wc_spin);
+#else
         // Write this
 	(void)cv;    // suppress warning until code gets written
 	(void)lock;  // suppress warning until code gets written
+#endif
 }
 
 void
 cv_broadcast(struct cv *cv, struct lock *lock)
 {
+#ifdef OPT_CONDVARS
+        KASSERT(lock->lk_owner == curthread);
+        spinlock_acquire(&cv->wc_spin);
+        wchan_wakeall(cv->cv_wchan, &cv->wc_spin);
+        spinlock_release(&cv->wc_spin);
+#else
 	// Write this
 	(void)cv;    // suppress warning until code gets written
 	(void)lock;  // suppress warning until code gets written
+#endif
 }
