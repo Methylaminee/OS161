@@ -37,6 +37,7 @@
  */
 
 #include <spinlock.h>
+#include "opt-syscalls.h"
 #include "opt-waitpid.h"
 
 struct addrspace;
@@ -73,6 +74,11 @@ struct proc {
 
 	/* add more material here as needed */
 	int p_exitStatus;
+
+#ifdef OPT_SYSCALLS
+    struct vnode **open_files;
+    unsigned int fd_count;
+#endif
 
 #ifdef OPT_WAITPID
 	pid_t p_id;

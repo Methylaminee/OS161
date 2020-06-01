@@ -50,6 +50,7 @@
 #include <vnode.h>
 #include <synch.h>
 #include <limits.h>
+#include "opt-syscalls.h"
 #include "opt-waitpid.h"
 
 /*
@@ -89,6 +90,11 @@ proc_create(const char *name)
 
 	/* VFS fields */
 	proc->p_cwd = NULL;
+
+#ifdef OPT_SYSCALLS
+    //struct vnode *open_files;
+    proc->fd_count = 3;
+#endif
 
 #ifdef OPT_WAITPID
 	proc->p_exit_lk = lock_create(name);

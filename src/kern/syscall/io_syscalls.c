@@ -9,6 +9,45 @@
 #include <copyinout.h>
 #include <syscall.h>
 #include <lib.h>
+#include <proc.h>
+#include <current.h>
+#include <limits.h>
+#include <vfs.h>
+#include <vnode.h>
+#include <uio.h>
+
+int sys_open(const char *filename, int flags, mode_t mode) {
+  struct vnode *v;
+  int result;
+
+  struct proc *current = curproc;
+
+  if (current->fd_count >= OPEN_MAX) {
+    /* ho già aperto troppi file */
+    return -1;
+  }
+
+  /* Open the file. */
+  result = vfs_open((char*)filename, flags, mode, &v);
+  if (result) {
+    return -1;
+  }
+
+  if (current->open_files == NULL) {
+    current->open_files = kmalloc(sizeof(v) * OPEN_MAX);
+  }
+
+  current->open_files[current->fd_count] = v;
+  kprintf("Opening fd n.%d... (%p)\n", current->fd_count, v);
+  return current->fd_count++;
+}
+
+void sys_close(int fd) {
+  struct vnode *vn = curproc->open_files[fd];
+  kprintf("Closing fd n.%d... (%p)\n", fd, vn);
+  VOP_DECREF(vn);
+  curproc->open_files[fd] = NULL;
+}
 
 /**
  * Read syscall
@@ -28,8 +67,20 @@ int sys_read(int fd, userptr_t buf, size_t size) {
       }
     }
     return size;
+  } else {
+    struct proc *current = curproc;
+    struct vnode *v = current->open_files[fd];
+
+    struct iovec iov;
+    struct uio u;
+    int result;
+
+    kprintf("Reading fd n.%d... (%p)\n", fd, v);
+    uio_kinit(&iov, &u, buf, size, 0, UIO_READ);
+
+    result = VOP_READ(v, &u);
+    return result;
   }
-  kprintf("sys_read supports only stdin\n");
   return -1;
 }
 
@@ -50,7 +101,19 @@ int sys_write(int fd, userptr_t buf, size_t nbytes) {
       putch(bp[i]);
     }
     return nbytes;
+  } else {
+    struct proc *current = curproc;
+    struct vnode *v = current->open_files[fd];
+
+    struct iovec iov;
+    struct uio u;
+    int result;
+
+    kprintf("Writing fd n.%d... (%p)\n", fd, v);
+    uio_kinit(&iov, &u, buf, nbytes, 0, UIO_WRITE);
+
+    result = VOP_WRITE(v, &u);
+    return result;
   }
-  kprintf("sys_write supports only stdout or stderr\n");
   return -1;
 }

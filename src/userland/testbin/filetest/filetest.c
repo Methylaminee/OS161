@@ -95,6 +95,16 @@ main(int argc, char *argv[])
 	/* ensure null termination */
 	readbuf[40] = 0;
 
+	/* for debug
+	for (int i = 0; i < 40; i++) {
+	  printf("%c", readbuf[i]);
+	}
+	printf("\n");
+    for (int i = 0; i < 40; i++) {
+    printf("%c", writebuf[i]);
+    }
+    */
+
 	if (strcmp(readbuf, writebuf)) {
 		errx(1, "Buffer data mismatch!");
 	}

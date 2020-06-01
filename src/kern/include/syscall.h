@@ -63,8 +63,10 @@ int sys_reboot(int code);
 int sys___time(userptr_t user_seconds, userptr_t user_nanoseconds);
 
 #if OPT_SYSCALLS
+int sys_open(const char *filename, int flags, mode_t mode);
 int sys_read(int fd, userptr_t buf, size_t size);
 int sys_write(int fd, userptr_t buf, size_t nbytes);
+void sys_close(int fd);
 
 void sys__exit(int status);
 void save_status(int status);
