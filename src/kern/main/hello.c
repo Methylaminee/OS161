@@ -9,10 +9,10 @@
 
 void hello(void) {
   int ramSize = 0;
-  ramSize = mainbus_ramsize() / K;
+  ramSize = mainbus_ramsize() / (K*K);
 
-  kprintf("****************************\n");
-  kprintf("Hello OS161, I'm Methylamine\n");
-  kprintf("System has %d KB of RAM\n", ramSize);
-  kprintf("****************************\n");
+  kprintf("********************************************\n");
+  kprintf("        Hello OS161, I'm Methylamine        \n");
+  kprintf("      System has %dMB of RAM - [%dKB]\n", ramSize, ramSize * K);
+  kprintf("********************************************\n");
 }

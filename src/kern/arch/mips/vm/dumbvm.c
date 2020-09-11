@@ -157,7 +157,7 @@ getfreeppages(unsigned long npages) {
     for (i=found; i < found+np; i++) {
       freeRamFrames[i] = 0;
     }
-    frameAllocSize[i] = np;
+    frameAllocSize[found] = np;
     paddr = (paddr_t) found * PAGE_SIZE;
   } else {
     paddr = 0;
@@ -547,7 +547,9 @@ as_copy(struct addrspace *old, struct addrspace **ret)
 void memstats(void) {
   struct timespec before, after, duration;
   int i;
-  unsigned long nFree = 0, largestBlockIndex = -1, largestBlockSize = 1;
+  unsigned long nFree = 0, largestBlockSize = 0;
+  long largestBlockIndex = -1;
+  int percentageFree = 0;
 
   gettime(&before);
 
@@ -565,8 +567,9 @@ void memstats(void) {
   gettime(&after);
   timespec_sub(&after, &before, &duration);
 
-  kprintf("Virtual memory status:\n");
-  kprintf(" > FREE PAGES COUNT: %d of %d - %d%% \n", (int)nFree, nRamFrames, (int)nFree/nRamFrames);
+  kprintf("* Virtual Memory Status *\n");
+  percentageFree = (int) (100 * nFree / nRamFrames);
+  kprintf(" > Free Memory: %d of %d - %d%% \n", (int)nFree, nRamFrames, percentageFree);
   if (largestBlockIndex > 0) {
     kprintf(" > LARGEST BLOCK ALLOCATED: %d blocks @ 0x%d\n", (int)largestBlockSize, (int)largestBlockIndex*PAGE_SIZE);
   }
