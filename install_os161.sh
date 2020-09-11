@@ -9,7 +9,7 @@ mkdir -p ~/OS161/tools/bin
 mkdir -p ~/OS161/scratch
 
 # add tools/bin to path 
-export PATH=~/os161/tools/bin:$PATH
+export PATH=~/OS161/tools/bin:$PATH
 
 
 # download source

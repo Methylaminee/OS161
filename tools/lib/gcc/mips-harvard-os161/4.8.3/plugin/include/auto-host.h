@@ -1615,7 +1615,7 @@
 
 /* Define if cloog is in use. */
 #ifndef USED_FOR_TARGET
-#define HAVE_cloog 1
+/* #undef HAVE_cloog */
 #endif
 
 

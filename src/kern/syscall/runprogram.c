@@ -44,7 +44,9 @@
 #include <vfs.h>
 #include <syscall.h>
 #include <test.h>
+#include <copyinout.h>
 
+int set_arguments(int argc, char **argv, vaddr_t stackptr);
 /*
  * Load program "progname" and start running it in usermode.
  * Does not return except on error.
@@ -52,7 +54,7 @@
  * Calls vfs_open on progname and thus may destroy it.
  */
 int
-runprogram(char *progname)
+runprogram(char *progname, int argc, char **argv)
 {
 	struct addrspace *as;
 	struct vnode *v;
@@ -97,8 +99,16 @@ runprogram(char *progname)
 		return result;
 	}
 
+    /* Copy arguments to proc as. */
+    if (argv != NULL) {
+        result = set_arguments(argc, argv, stackptr);
+        if (result) {
+            return result;
+        }
+    }
+
 	/* Warp to user mode. */
-	enter_new_process(0 /*argc*/, NULL /*userspace addr of argv*/,
+	enter_new_process(argc /*argc*/, argv != NULL ? (userptr_t) stackptr : NULL /*userspace addr of argv*/,
 			  NULL /*userspace addr of environment*/,
 			  stackptr, entrypoint);
 
@@ -107,3 +117,30 @@ runprogram(char *progname)
 	return EINVAL;
 }
 
+int set_arguments(int argc, char **argv, vaddr_t stackptr) {
+    vaddr_t args_ptr[argc];
+    int err;
+
+    for(int i=0; i < argc; i++) {
+        int param_size = strlen(argv[i]);
+        int param_size_aligned = ((param_size / 4) + 1) * 4;
+        stackptr -= param_size_aligned;
+        err = copyoutstr(argv[i], (userptr_t)stackptr, param_size, NULL);
+        if (err) {
+            kprintf("ERROR! During param copy to user stack\n");
+            return err;
+        }
+        args_ptr[i] = stackptr;
+    }
+
+    for(int i=argc; i >= 0; i--) {
+        stackptr -= 4;
+        err = copyout(&(args_ptr[i]), (userptr_t)stackptr, 4);
+        if(err!=0){
+            kprintf("ERROR! During param ptr copy to user stack\n");
+            return err;
+        }
+    }
+
+    return 0;
+}

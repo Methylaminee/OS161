@@ -38,4 +38,4 @@ dlopen=''
 dlpreopen=''
 
 # Directory that this library needs to be installed in:
-libdir='/home/methylamine/os161/tools/libexec/gcc/mips-harvard-os161/4.8.3'
+libdir='/home/methylamine/OS161/tools/libexec/gcc/mips-harvard-os161/4.8.3'

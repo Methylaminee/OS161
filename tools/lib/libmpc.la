@@ -17,7 +17,7 @@ old_library='libmpc.a'
 inherited_linker_flags=''
 
 # Libraries that this one depends upon.
-dependency_libs=' -L/home/methylamine/os161/tools/lib /home/methylamine/os161/tools/lib/libmpfr.la /home/methylamine/os161/tools/lib/libgmp.la'
+dependency_libs=' -L/home/methylamine/OS161/tools/lib /home/methylamine/OS161/tools/lib/libmpfr.la /home/methylamine/OS161/tools/lib/libgmp.la'
 
 # Names of additional weak libraries provided by this library
 weak_library_names=''
@@ -38,4 +38,4 @@ dlopen=''
 dlpreopen=''
 
 # Directory that this library needs to be installed in:
-libdir='/home/methylamine/os161/tools/lib'
+libdir='/home/methylamine/OS161/tools/lib'

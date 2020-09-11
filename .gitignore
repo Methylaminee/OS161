@@ -1,4 +1,4 @@
-scratch/
-src/cmake-build-debug/
-tools/
-toolbuild/
+/scratch/
+/src/cmake-build-debug/
+/tools/
+/toolbuild/

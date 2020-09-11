@@ -3,7 +3,7 @@ OUTPUT_FORMAT("elf32-tradbigmips", "elf32-tradbigmips",
 	      "elf32-tradlittlemips")
 OUTPUT_ARCH(mips)
 ENTRY(__start)
-SEARCH_DIR("/home/methylamine/os161/tools/mips-harvard-os161/lib");
+SEARCH_DIR("/home/methylamine/OS161/tools/mips-harvard-os161/lib");
 SECTIONS
 {
   /* Read-only sections, merged into text segment: */
